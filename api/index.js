@@ -97,7 +97,7 @@ app.post('/api/questions/generate', authenticate, async (req, res) => {
   if (!process.env.GROQ_API_KEY) return res.status(500).json({ message: "API Key missing" });
   
   const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-  const prompt = `Generate exactly 5 highly technical interview questions for a ${jobRole} focusing on ${technology} with ${experienceLevel}. Return the output AS A STRICT JSON ARRAY OF STRINGS ONLY. Do not include any markdown, backticks, or conversational text.`;
+  const prompt = `Generate exactly 5 highly technical interview questions for a ${jobRole} focusing on ${technology} with ${experienceLevel}. Return the output AS A STRICT JSON ARRAY OF OBJECTS. Each object must have the keys: "id" (a random unique string), "question" (the text), "difficulty" ("Easy", "Medium", or "Hard"), and "category" (e.g., "Technical"). Do not include markdown, backticks, or conversational text.`;
   try {
     const chatCompletion = await groq.chat.completions.create({
       messages: [{ role: "user", content: prompt }], model: "llama-3.1-8b-instant", temperature: 0.5,
@@ -106,7 +106,12 @@ app.post('/api/questions/generate', authenticate, async (req, res) => {
     if (resultText.startsWith("```json")) resultText = resultText.substring(7);
     if (resultText.startsWith("```")) resultText = resultText.substring(3);
     if (resultText.endsWith("```")) resultText = resultText.substring(0, resultText.length - 3);
-    const questions = JSON.parse(resultText.trim());
+    
+    let questions = JSON.parse(resultText.trim());
+    // Fallback if AI returns strings instead of objects
+    if (questions.length > 0 && typeof questions[0] === 'string') {
+        questions = questions.map((q, i) => ({ id: `q_${i}`, question: q, difficulty: 'Medium', category: 'Technical' }));
+    }
     
     const result = await query(
       'INSERT INTO assessments (user_id, job_role, technology, experience_level, assessment_data, score, cheating_detected) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id',
