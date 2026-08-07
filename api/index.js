@@ -31,29 +31,29 @@ function authenticate(req, res, next) {
 
 // ── Auth ──
 app.post('/api/auth/register', async (req, res) => {
-  const { username, email, password } = req.body;
+  const { name, email, password } = req.body;
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     const result = await query(
-      'INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING id, username, email',
-      [username, email, hashedPassword]
+      'INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING id, username as name, email',
+      [name || email, email, hashedPassword]
     );
     res.status(201).json({ message: 'User registered successfully', user: result.rows[0] });
   } catch (err) {
-    res.status(400).json({ message: 'Username or email already exists' });
+    res.status(400).json({ message: 'Email already exists' });
   }
 });
 
 app.post('/api/auth/login', async (req, res) => {
-  const { username, password } = req.body;
+  const { email, password } = req.body;
   try {
-    const result = await query('SELECT * FROM users WHERE username = $1', [username]);
-    if (result.rows.length === 0) return res.status(401).json({ message: 'Invalid username or password' });
+    const result = await query('SELECT * FROM users WHERE email = $1', [email]);
+    if (result.rows.length === 0) return res.status(401).json({ message: 'Invalid email or password' });
     const user = result.rows[0];
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(401).json({ message: 'Invalid username or password' });
+    if (!isMatch) return res.status(401).json({ message: 'Invalid email or password' });
     const token = jwt.sign({ sub: user.username, id: user.id }, process.env.JWT_SECRET || 'fallback_secret', { expiresIn: '24h' });
-    res.status(200).json({ token, type: 'Bearer', username: user.username });
+    res.status(200).json({ token, type: 'Bearer', username: user.username, name: user.username, email: user.email });
   } catch (err) {
     res.status(500).json({ message: 'Internal Server Error' });
   }
@@ -77,7 +77,7 @@ app.post('/api/auth/demo', async (req, res) => {
 });
 
 app.get('/api/auth/me', authenticate, (req, res) => {
-  res.status(200).json({ username: req.user.sub, id: req.user.id });
+  res.status(200).json({ username: req.user.sub, name: req.user.sub, id: req.user.id });
 });
 
 // ── Options ──
