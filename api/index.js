@@ -100,7 +100,7 @@ app.post('/api/questions/generate', authenticate, async (req, res) => {
   const prompt = `Generate exactly 5 highly technical interview questions for a ${jobRole} focusing on ${technology} with ${experienceLevel}. Return the output AS A STRICT JSON ARRAY OF STRINGS ONLY. Do not include any markdown, backticks, or conversational text.`;
   try {
     const chatCompletion = await groq.chat.completions.create({
-      messages: [{ role: "user", content: prompt }], model: "llama3-8b-8192", temperature: 0.5,
+      messages: [{ role: "user", content: prompt }], model: "llama-3.1-8b-instant", temperature: 0.5,
     });
     let resultText = chatCompletion.choices[0].message.content.trim();
     if (resultText.startsWith("```json")) resultText = resultText.substring(7);
@@ -114,7 +114,8 @@ app.post('/api/questions/generate', authenticate, async (req, res) => {
     );
     res.status(200).json({ sessionId: result.rows[0].id, questions });
   } catch (err) {
-    res.status(500).json({ message: 'Failed to generate session' });
+    console.error("Groq Generation Error:", err);
+    res.status(500).json({ message: 'Failed to generate session', error: err.message });
   }
 });
 
