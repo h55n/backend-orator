@@ -82,12 +82,8 @@ export default function HistoryPage() {
           <div className="flex flex-col gap-4 stagger">
             {sessions.map((s, idx) => {
               let assessment = null;
-              if (s.assessmentData) {
-                try {
-                  assessment = JSON.parse(s.assessmentData);
-                } catch(e) {
-                  console.error("Failed to parse assessmentData for session", s.id);
-                }
+              if (s.assessmentData && s.assessmentData.evaluation) {
+                assessment = s.assessmentData.evaluation;
               }
               
               return (
@@ -113,7 +109,7 @@ export default function HistoryPage() {
                       )}
                       <div className="flex flex-col items-end gap-2">
                         <span className="badge border border-[var(--color-border-subtle)] bg-transparent text-[var(--color-primary)]">
-                          {s.questionCount || 0} Qs
+                          {s.questions ? s.questions.length : 0} Qs
                         </span>
                         <span className="text-sm font-medium text-[var(--color-on-surface)] opacity-50">{formatDate(s.createdAt)}</span>
                       </div>

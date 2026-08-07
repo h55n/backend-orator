@@ -17,19 +17,21 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    Promise.all([
+    Promise.allSettled([
       questionService.getHistory(0, 3),
       favoriteService.getAll(0, 1)
-    ]).then(([histRes, favRes]) => {
-      const historyData = histRes.data.content || histRes.data
+    ]).then(([histResult, favResult]) => {
+      const histRes = histResult.status === 'fulfilled' ? histResult.value : { data: [] }
+      const favRes = favResult.status === 'fulfilled' ? favResult.value : { data: [] }
+
+      const historyData = histRes.data.content || histRes.data || []
       setRecent(historyData.slice(0, 3))
       setStats({
-        sessions: histRes.data.totalElements || historyData.length,
-        questions: historyData.reduce((acc, curr) => acc + (curr.questionCount || 0), 0),
+        sessions: histRes.data.totalElements || historyData.length || 0,
+        questions: historyData.reduce((acc, curr) => acc + (curr.questions ? curr.questions.length : 0), 0),
         favorites: favRes.data.totalElements || favRes.data.length || 0
       })
-    }).catch(err => console.error(err))
-    .finally(() => setLoading(false))
+    }).finally(() => setLoading(false))
   }, [])
 
   return (
@@ -118,12 +120,8 @@ export default function DashboardPage() {
           <div className="flex flex-col gap-4 stagger">
             {recent.map((s, i) => {
               let assessment = null;
-              if (s.assessmentData) {
-                try {
-                  assessment = JSON.parse(s.assessmentData);
-                } catch(e) {
-                  console.error("Failed to parse assessmentData for session", s.id);
-                }
+              if (s.assessmentData && s.assessmentData.evaluation) {
+                assessment = s.assessmentData.evaluation;
               }
               return (
               <Link key={s.id} to={`/session/${s.id}`} className="p-6 md:px-8 rounded-[24px] bg-[var(--color-surface)] border border-[var(--color-border-subtle)] hover:shadow-md flex items-center justify-between animate-fade-up hover:-translate-y-1 transition-all" style={{ animationDelay: `${i * 50}ms` }}>
@@ -143,7 +141,7 @@ export default function DashboardPage() {
                     </div>
                   )}
                   <div className="flex flex-col items-end gap-2">
-                    <span className="badge">{s.questionCount || 0} Qs</span>
+                    <span className="badge">{s.questions ? s.questions.length : 0} Qs</span>
                     <span className="text-sm text-[var(--color-on-surface)] opacity-50 font-medium">
                       {(() => {
                         try {

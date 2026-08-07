@@ -127,7 +127,20 @@ app.post('/api/questions/generate', authenticate, async (req, res) => {
 app.get('/api/questions/history', authenticate, async (req, res) => {
   try {
     const result = await query('SELECT * FROM assessments WHERE user_id = $1 ORDER BY created_at DESC', [req.user.id]);
-    const history = result.rows.map(row => ({ ...row, assessment_data: JSON.parse(row.assessment_data) }));
+    const history = result.rows.map(row => {
+      const data = JSON.parse(row.assessment_data);
+      return {
+        id: row.id,
+        jobRole: row.job_role,
+        technology: row.technology,
+        experienceLevel: row.experience_level,
+        questions: data.questions,
+        assessmentData: data,
+        score: row.score,
+        cheatingDetected: row.cheating_detected,
+        createdAt: row.created_at
+      }
+    });
     res.status(200).json(history);
   } catch (err) {
     res.status(500).json({ message: 'Failed to fetch history' });
@@ -142,7 +155,7 @@ app.get('/api/questions/session/:id', authenticate, async (req, res) => {
     session.assessment_data = JSON.parse(session.assessment_data);
     res.status(200).json({
       id: session.id, jobRole: session.job_role, technology: session.technology, experienceLevel: session.experience_level,
-      questions: session.assessment_data.questions, score: session.score, cheatingDetected: session.cheating_detected
+      questions: session.assessment_data.questions, evaluation: session.assessment_data.evaluation, score: session.score, cheatingDetected: session.cheating_detected
     });
   } catch (err) {
     res.status(500).json({ message: 'Failed to get session' });
@@ -203,6 +216,76 @@ Do not include any markdown, backticks, or conversational text. Return ONLY JSON
   } catch (err) {
     console.error('Assessment error:', err);
     res.status(500).json({ message: 'Failed to submit assessment' });
+  }
+});
+
+// Create favorites table route
+app.get('/api/init-db', async (req, res) => {
+  try {
+    await query(`
+      CREATE TABLE IF NOT EXISTS favorites (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        question_id VARCHAR(255) NOT NULL,
+        question_data TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE (user_id, question_id)
+      );
+    `);
+    res.status(200).json({ message: 'Table created' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Favorites endpoints
+app.post('/api/favorites/:id', authenticate, async (req, res) => {
+  try {
+    const questionId = req.params.id;
+    // We need to fetch the question data from previous assessments
+    const result = await query('SELECT assessment_data FROM assessments WHERE user_id = $1', [req.user.id]);
+    let questionToSave = null;
+    for (const row of result.rows) {
+      const data = JSON.parse(row.assessment_data);
+      const q = data.questions.find(x => x.id === questionId);
+      if (q) { questionToSave = q; break; }
+    }
+    if (!questionToSave) return res.status(404).json({ message: 'Question not found' });
+
+    await query(
+      'INSERT INTO favorites (user_id, question_id, question_data) VALUES ($1, $2, $3) ON CONFLICT (user_id, question_id) DO NOTHING',
+      [req.user.id, questionId, JSON.stringify(questionToSave)]
+    );
+    res.status(200).json({ message: 'Added to favorites' });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to add favorite' });
+  }
+});
+
+app.delete('/api/favorites/:id', authenticate, async (req, res) => {
+  try {
+    await query('DELETE FROM favorites WHERE user_id = $1 AND question_id = $2', [req.user.id, req.params.id]);
+    res.status(200).json({ message: 'Removed from favorites' });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to remove favorite' });
+  }
+});
+
+app.get('/api/favorites', authenticate, async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 0;
+    const size = parseInt(req.query.size) || 20;
+    const offset = page * size;
+    const countResult = await query('SELECT COUNT(*) FROM favorites WHERE user_id = $1', [req.user.id]);
+    const totalElements = parseInt(countResult.rows[0].count);
+    const totalPages = Math.ceil(totalElements / size);
+    
+    const result = await query('SELECT question_data FROM favorites WHERE user_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3', [req.user.id, size, offset]);
+    const content = result.rows.map(row => JSON.parse(row.question_data));
+    
+    res.status(200).json({ content, totalPages, totalElements });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to get favorites' });
   }
 });
 

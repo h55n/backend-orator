@@ -89,8 +89,9 @@ export default function SessionPage() {
         setSession(data)
         const favSet = new Set(data.questions?.filter(q => q.isFavorite).map(q => q.id))
         setFavorites(favSet)
-        if (data.assessmentData) {
-          setAssessmentData(JSON.parse(data.assessmentData))
+        if (data.evaluation) {
+          setAssessmentData(data.evaluation)
+          setMode('summary')
         }
       })
       .catch(() => { toast.error('Session not found'); navigate('/history') })
