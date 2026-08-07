@@ -150,15 +150,59 @@ app.get('/api/questions/session/:id', authenticate, async (req, res) => {
 });
 
 app.post('/api/questions/session/:id/assess', authenticate, async (req, res) => {
-  const { answers, cheatingDetected } = req.body;
+  const { answers } = req.body;
+  if (!process.env.GROQ_API_KEY) return res.status(500).json({ message: "API Key missing" });
+  
   try {
-    // Generate a random score for this demo endpoint
-    const score = Math.floor(Math.random() * (100 - 60 + 1) + 60);
-    const feedback = [{ question: "Good job", feedback: "Well done" }];
-    await query('UPDATE assessments SET score = $1, cheating_detected = $2 WHERE id = $3 AND user_id = $4', [score, cheatingDetected, req.params.id, req.user.id]);
-    res.status(200).json({ overallScore: score, questionsFeedback: feedback });
+    const result = await query('SELECT * FROM assessments WHERE id = $1 AND user_id = $2', [req.params.id, req.user.id]);
+    if (result.rows.length === 0) return res.status(404).json({ message: 'Session not found' });
+    const session = result.rows[0];
+    const assessmentData = JSON.parse(session.assessment_data);
+    const questions = assessmentData.questions;
+
+    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+    const prompt = `You are an expert technical interviewer evaluating a candidate.
+Here are the questions and the candidate's answers:
+${questions.map(q => {
+  const ans = answers[q.id || q];
+  return `Q ID: ${q.id || q}\nQuestion: ${q.question || q}\nAnswer: ${ans ? ans.text : 'No answer'}\nPaste Count: ${ans ? ans.pasteCount : 0}\nTab Switches: ${ans ? ans.tabSwitches : 0}`;
+}).join('\n\n')}
+
+Return the output AS A STRICT JSON OBJECT exactly matching this schema:
+{
+  "overallScore": number (0-100),
+  "overallFeedback": "string",
+  "questionAssessments": [
+    {
+      "questionId": "string (the Q ID)",
+      "score": number (0-10),
+      "feedback": "string",
+      "isAiGenerated": boolean (true if cheating suspected based on pastes/tabs or text),
+      "aiReasoning": "string"
+    }
+  ]
+}
+Do not include any markdown, backticks, or conversational text. Return ONLY JSON.`;
+
+    const chatCompletion = await groq.chat.completions.create({
+      messages: [{ role: "user", content: prompt }], model: "llama-3.1-8b-instant", temperature: 0.3,
+    });
+    
+    let resultText = chatCompletion.choices[0].message.content.trim();
+    if (resultText.startsWith("```json")) resultText = resultText.substring(7);
+    if (resultText.startsWith("```")) resultText = resultText.substring(3);
+    if (resultText.endsWith("```")) resultText = resultText.substring(0, resultText.length - 3);
+    
+    const evaluation = JSON.parse(resultText.trim());
+    const isCheating = evaluation.questionAssessments.some(qa => qa.isAiGenerated);
+    
+    assessmentData.evaluation = evaluation;
+    await query('UPDATE assessments SET score = $1, cheating_detected = $2, assessment_data = $3 WHERE id = $4', [evaluation.overallScore, isCheating, JSON.stringify(assessmentData), session.id]);
+    
+    res.status(200).json(evaluation);
   } catch (err) {
-    res.status(500).json({ message: 'Failed to submit' });
+    console.error('Assessment error:', err);
+    res.status(500).json({ message: 'Failed to submit assessment' });
   }
 });
 
