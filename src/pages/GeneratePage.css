@@ -1,0 +1,187 @@
+/* ============================================================
+   Generate Page — Ample Market Minimal
+   ============================================================ */
+
+.generate-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.generate-header {
+  margin-bottom: var(--space-xs);
+  max-width: 600px;
+}
+
+.generate-title {
+  font: var(--text-headline-display);
+  letter-spacing: var(--ls-headline-display);
+  color: var(--color-primary);
+  margin-bottom: var(--space-xs);
+}
+
+.generate-sub {
+  font: var(--text-body-lg);
+  color: var(--color-secondary);
+}
+
+.generate-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: var(--space-xl);
+  align-items: start;
+}
+
+/* ── Form Card ── */
+.generate-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.req { color: var(--color-error); }
+
+.select-wrap { position: relative; }
+.select-icon {
+  position: absolute;
+  right: 16px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-primary);
+  pointer-events: none;
+}
+
+/* ── Custom Range Slider ── */
+.range-container {
+  margin-top: 8px;
+}
+
+.form-hint {
+  font: var(--text-body-sm);
+  color: var(--color-secondary);
+  margin-top: 4px;
+}
+
+.count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 12px;
+  padding: 2px 10px;
+  background-color: var(--color-primary);
+  color: var(--color-surface);
+  border-radius: var(--radius-full);
+  font: var(--text-label-sm);
+}
+
+.range-input {
+  width: 100%;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+  height: 2px;
+  background: var(--color-border-subtle);
+  outline: none;
+  -webkit-appearance: none;
+  margin-top: var(--space-sm);
+}
+.range-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  cursor: pointer;
+  transition: transform var(--transition-fast);
+}
+.range-input::-webkit-slider-thumb:hover { transform: scale(1.1); }
+
+.range-labels {
+  display: flex;
+  justify-content: space-between;
+  font: var(--text-caption);
+  color: var(--color-secondary);
+  margin-top: 12px;
+}
+
+.generate-btn {
+  width: 100%;
+  margin-top: var(--space-md);
+}
+
+/* ── Info Panel ── */
+.generate-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.info-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.info-title {
+  font: var(--text-headline-sm);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.info-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  counter-reset: info-counter;
+}
+
+.info-list li {
+  font: var(--text-body-md);
+  color: var(--color-secondary);
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.info-list li::before {
+  counter-increment: info-counter;
+  content: counter(info-counter);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--color-neutral);
+  color: var(--color-primary);
+  font: var(--text-label-sm);
+  flex-shrink: 0;
+  border: 1px solid var(--color-border-subtle);
+}
+
+.info-cats {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.info-cat-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+.info-cat-desc {
+  font: var(--text-body-sm);
+  color: var(--color-secondary);
+  line-height: 1.5;
+}
+
+/* ── Responsive ── */
+@media (max-width: 992px) {
+  .generate-layout { grid-template-columns: 1fr; }
+  .generate-info { flex-direction: row; }
+  .generate-info .card { flex: 1; }
+}
+
+@media (max-width: 640px) {
+  .generate-info { flex-direction: column; }
+  .generate-form { padding: var(--space-md); }
+}

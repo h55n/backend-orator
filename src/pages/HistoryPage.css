@@ -1,0 +1,119 @@
+/* ============================================================
+   History Page — Ample Market Minimal
+   ============================================================ */
+
+.history-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.history-header {
+  margin-bottom: var(--space-xs);
+}
+
+.history-title {
+  font: var(--text-headline-display);
+  letter-spacing: var(--ls-headline-display);
+  color: var(--color-primary);
+  margin-bottom: 8px;
+}
+
+.history-sub {
+  font: var(--text-body-lg);
+  color: var(--color-secondary);
+}
+
+/* ── List ── */
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.history-card {
+  display: flex;
+  align-items: stretch;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 0;
+  overflow: hidden;
+  transition: border-color var(--transition-fast);
+}
+
+.history-card:hover {
+  border-color: rgba(17,17,17,0.15);
+}
+
+.history-card-link {
+  flex: 1;
+  padding: var(--space-md);
+}
+
+.history-card-body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.history-main {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.history-role {
+  font: var(--text-headline-sm);
+  color: var(--color-primary);
+}
+
+.history-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.history-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-left: auto;
+}
+
+.history-date {
+  font: var(--text-label-md);
+  color: var(--color-secondary);
+}
+
+.history-arrow {
+  color: var(--color-secondary);
+  transition: transform var(--transition-fast), color var(--transition-fast);
+}
+
+.history-card:hover .history-arrow {
+  transform: translateX(4px);
+  color: var(--color-primary);
+}
+
+/* Delete Button */
+.history-delete {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  background-color: var(--color-surface);
+  border-left: 1px solid var(--color-border-subtle);
+  color: var(--color-error);
+  transition: background-color var(--transition-fast);
+}
+.history-delete:hover:not(:disabled) {
+  background-color: rgba(214,69,69,0.05);
+}
+
+@media (max-width: 640px) {
+  .history-card-body { flex-direction: column; align-items: flex-start; }
+  .history-right { margin-left: 0; width: 100%; justify-content: space-between; }
+}

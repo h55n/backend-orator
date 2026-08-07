@@ -1,0 +1,85 @@
+:root {
+  /* ── Tines Editorial Color Palette ── */
+  --color-primary: #6D4AE3;
+  --color-primary-60: #8D75E6;
+  --color-primary-20: #E9E1FF;
+  --color-secondary: #F47E3F;
+  --color-tertiary: #5F3FC4;
+  
+  --color-neutral: #FCF9F5;
+  --color-surface: #FFFFFF;
+  --color-on-surface: #5B47B6;
+  --color-on-primary: #FFFFFF;
+  --color-border-subtle: #D7CCFF;
+  
+  --color-success: #1F7A57;
+  --color-error: #D94C3D;
+
+  /* ── Typography (Instrument Serif & Outfit) ── */
+  --font-display: 'Instrument Serif', serif;
+  --font-sans: 'Outfit', sans-serif;
+
+  /* Headlines */
+  --text-headline-display: 400 58px/70px var(--font-display);
+  --ls-headline-display: -1.45px;
+  
+  --text-headline-lg: 400 42px/50px var(--font-display);
+  --ls-headline-lg: -0.76px;
+  
+  --text-headline-md: 400 30px/36px var(--font-display);
+  --ls-headline-md: 0px;
+  
+  --text-headline-sm: 400 22px/26px var(--font-display);
+  --ls-headline-sm: -0.52px;
+
+  /* Body */
+  --text-body-lg: 400 18px/28px var(--font-sans);
+  --ls-body-lg: -0.16px;
+  
+  --text-body-md: 400 16px/22px var(--font-sans);
+  --ls-body-md: -0.16px;
+  
+  --text-body-sm: 400 14px/20px var(--font-sans);
+  --ls-body-sm: -0.12px;
+
+  /* Labels */
+  --text-label-lg: 600 16px/20px var(--font-sans);
+  --ls-label-lg: 0px;
+  
+  --text-label-md: 600 14px/20px var(--font-sans);
+  --ls-label-md: 0px;
+  
+  --text-label-sm: 700 12px/16px var(--font-sans);
+  --ls-label-sm: 0.04em;
+
+  /* Components */
+  --text-nav-link: 700 14px/20px var(--font-sans);
+  --ls-nav-link: 0px;
+  
+  --text-button: 600 14px/18px var(--font-sans);
+  --ls-button: 0.04em;
+  
+  --text-caption: 500 12px/16px var(--font-sans);
+  --ls-caption: 0px;
+
+  /* ── Rounded Corners ── */
+  --radius-none: 0px;
+  --radius-sm: 4px;
+  --radius-md: 7px;
+  --radius-lg: 12px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* ── Spacing ── */
+  --space-xs: 6px;
+  --space-sm: 14px;
+  --space-md: 24px;
+  --space-lg: 34px;
+  --space-xl: 168px;
+  --space-gutter: 24px;
+  --space-section: 168px;
+  
+  /* ── Transitions ── */
+  --transition-fast: 0.15s ease-out;
+  --transition-base: 0.25s ease-out;
+}

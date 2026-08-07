@@ -1,0 +1,190 @@
+/* ============================================================
+   AppLayout — Tines Sidebar App Shell
+   ============================================================ */
+
+.app-layout {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  background: linear-gradient(135deg, #F8F6FF 0%, #E9E1FF 100%);
+  padding: 16px;
+  overflow: hidden;
+}
+
+/* ── Floating App Shell Container ── */
+.app-shell {
+  display: flex;
+  flex: 1;
+  background-color: var(--color-surface);
+  border-radius: 32px;
+  border: 1px solid var(--color-border-subtle);
+  box-shadow: 0 10px 40px rgba(91, 71, 182, 0.08);
+  overflow: hidden;
+}
+
+/* ── Sidebar ── */
+.app-sidebar {
+  width: 260px;
+  background-color: var(--color-surface);
+  border-right: 1px solid var(--color-border-subtle);
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-md);
+  z-index: 10;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: var(--space-lg);
+  padding: 0 var(--space-xs);
+}
+
+.brand-icon {
+  color: var(--color-primary);
+}
+
+.brand-text {
+  font: var(--text-headline-sm);
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  flex: 1;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--color-on-surface);
+  font: var(--text-label-md);
+  padding: 10px 14px;
+  border-radius: var(--radius-full);
+  transition: all var(--transition-fast);
+  opacity: 0.8;
+}
+
+.nav-item:hover {
+  background-color: var(--color-neutral);
+  opacity: 1;
+}
+
+.nav-item.active {
+  background-color: var(--color-primary-20);
+  color: var(--color-primary);
+  opacity: 1;
+  font-weight: 700;
+}
+
+.sidebar-footer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-top: auto;
+  border-top: 1px solid var(--color-border-subtle);
+  padding-top: var(--space-md);
+}
+
+.user-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font: var(--text-label-md);
+  color: var(--color-on-surface);
+  padding: 8px 12px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-neutral);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-badge-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--color-success);
+  flex-shrink: 0;
+}
+
+/* ── Main Content Area ── */
+.app-main {
+  flex: 1;
+  background-color: var(--color-neutral);
+  overflow-y: auto;
+  padding: var(--space-lg) var(--space-lg);
+  position: relative;
+}
+
+/* ── Mobile Overrides ── */
+.mobile-menu-btn {
+  display: none;
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 50;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-full);
+  padding: 8px;
+  color: var(--color-primary);
+}
+
+@media (max-width: 1024px) {
+  .app-layout {
+    padding: 0;
+  }
+  .app-shell {
+    border-radius: 0;
+    border: none;
+  }
+  .app-main {
+    padding: var(--space-lg) var(--space-md);
+  }
+}
+
+@media (max-width: 768px) {
+  .mobile-menu-btn {
+    display: block;
+  }
+  .app-sidebar {
+    position: absolute;
+    left: -260px;
+    top: 0;
+    bottom: 0;
+    transition: left var(--transition-base);
+    box-shadow: 4px 0 24px rgba(0,0,0,0.05);
+  }
+  .app-sidebar.mobile-open {
+    left: 0;
+  }
+}
+
+@media print {
+  .app-layout {
+    height: auto !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    background: white !important;
+  }
+  .app-shell {
+    box-shadow: none !important;
+    border: none !important;
+    overflow: visible !important;
+  }
+  .app-sidebar, .mobile-menu-btn {
+    display: none !important;
+  }
+  .app-main {
+    overflow-y: visible !important;
+    height: auto !important;
+    padding: 0 !important;
+    background: white !important;
+  }
+}

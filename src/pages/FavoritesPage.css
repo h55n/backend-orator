@@ -1,0 +1,90 @@
+/* ============================================================
+   Favorites Page — Ample Market Minimal
+   ============================================================ */
+
+.fav-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.fav-header {
+  margin-bottom: var(--space-xs);
+}
+
+.fav-title {
+  font: var(--text-headline-display);
+  letter-spacing: var(--ls-headline-display);
+  color: var(--color-primary);
+  margin-bottom: 8px;
+}
+
+.fav-sub {
+  font: var(--text-body-lg);
+  color: var(--color-secondary);
+}
+
+/* ── Masonry Grid Layout ── */
+.fav-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--space-md);
+  align-items: start;
+}
+
+.fav-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: var(--space-md);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+}
+
+.fav-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.fav-badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.fav-remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px; height: 32px;
+  border-radius: var(--radius-sm);
+  color: var(--color-secondary);
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.fav-remove:hover {
+  background-color: var(--color-neutral);
+  color: var(--color-error);
+}
+
+.fav-text {
+  font: var(--text-body-md);
+  color: var(--color-primary);
+  line-height: 1.6;
+}
+
+.fav-source {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border-subtle);
+  font: var(--text-caption);
+  color: var(--color-secondary);
+}
+
+@media (max-width: 640px) {
+  .fav-list { grid-template-columns: 1fr; }
+}
