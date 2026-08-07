@@ -95,16 +95,15 @@ app.post('/api/questions/generate', authenticate, async (req, res) => {
   if (!process.env.GROQ_API_KEY) return res.status(500).json({ message: "API Key missing" });
   
   const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-  const prompt = \`Generate exactly 5 highly technical interview questions for a \${jobRole} focusing on \${technology} with \${experienceLevel}. Return the output AS A STRICT JSON ARRAY OF STRINGS ONLY. Do not include any markdown, backticks, or conversational text.\`;
-  
+  const prompt = `Generate exactly 5 highly technical interview questions for a ${jobRole} focusing on ${technology} with ${experienceLevel}. Return the output AS A STRICT JSON ARRAY OF STRINGS ONLY. Do not include any markdown, backticks, or conversational text.`;
   try {
     const chatCompletion = await groq.chat.completions.create({
       messages: [{ role: "user", content: prompt }], model: "llama3-8b-8192", temperature: 0.5,
     });
     let resultText = chatCompletion.choices[0].message.content.trim();
-    if (resultText.startsWith("\`\`\`json")) resultText = resultText.substring(7);
-    if (resultText.startsWith("\`\`\`")) resultText = resultText.substring(3);
-    if (resultText.endsWith("\`\`\`")) resultText = resultText.substring(0, resultText.length - 3);
+    if (resultText.startsWith("```json")) resultText = resultText.substring(7);
+    if (resultText.startsWith("```")) resultText = resultText.substring(3);
+    if (resultText.endsWith("```")) resultText = resultText.substring(0, resultText.length - 3);
     const questions = JSON.parse(resultText.trim());
     
     const result = await query(
