@@ -7,6 +7,10 @@ import { Groq } from 'groq-sdk';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
+if (!process.env.JWT_SECRET) {
+  throw new Error('JWT_SECRET must be configured.');
+}
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -22,7 +26,7 @@ function authenticate(req, res, next) {
   if (!authHeader || !authHeader.startsWith('Bearer ')) return res.status(401).json({ message: 'Unauthorized' });
   const token = authHeader.split(' ')[1];
   try {
-    req.user = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret');
+    req.user = jwt.verify(token, process.env.JWT_SECRET);
     next();
   } catch (err) {
     return res.status(401).json({ message: 'Unauthorized' });
@@ -39,7 +43,7 @@ app.post('/api/auth/register', async (req, res) => {
       [name || email, email, hashedPassword]
     );
     const user = result.rows[0];
-    const token = jwt.sign({ sub: user.name, id: user.id }, process.env.JWT_SECRET || 'fallback_secret', { expiresIn: '24h' });
+    const token = jwt.sign({ sub: user.name, id: user.id }, process.env.JWT_SECRET, { expiresIn: '24h' });
     res.status(201).json({ message: 'User registered successfully', token, user });
   } catch (err) {
     res.status(400).json({ message: 'Email already exists' });
@@ -54,7 +58,7 @@ app.post('/api/auth/login', async (req, res) => {
     const user = result.rows[0];
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ message: 'Invalid email or password' });
-    const token = jwt.sign({ sub: user.username, id: user.id }, process.env.JWT_SECRET || 'fallback_secret', { expiresIn: '24h' });
+    const token = jwt.sign({ sub: user.username, id: user.id }, process.env.JWT_SECRET, { expiresIn: '24h' });
     res.status(200).json({ token, user: { id: user.id, name: user.username, email: user.email } });
   } catch (err) {
     res.status(500).json({ message: 'Internal Server Error' });
@@ -71,7 +75,7 @@ app.post('/api/auth/demo', async (req, res) => {
     } else {
         user = result.rows[0];
     }
-    const token = jwt.sign({ sub: user.username, id: user.id }, process.env.JWT_SECRET || 'fallback_secret', { expiresIn: '24h' });
+    const token = jwt.sign({ sub: user.username, id: user.id }, process.env.JWT_SECRET, { expiresIn: '24h' });
     res.status(200).json({ token, user: { id: user.id, name: user.username, email: user.email } });
   } catch (err) {
     res.status(500).json({ message: 'Internal Server Error' });
