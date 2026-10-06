@@ -78,7 +78,7 @@ export default function LandingPage() {
                 </div>
                 <div>
                   <h3 className="headline-sm mb-3">AI on your terms, always</h3>
-                  <p className="body-md opacity-90">Start where you're already working. Choose where, when, and how your LLMs are used, with freedom to switch as your AI strategy evolves.</p>
+                  <p className="body-md opacity-90">Start where you&apos;re already working. Choose where, when, and how your LLMs are used, with freedom to switch as your AI strategy evolves.</p>
                 </div>
               </div>
 
@@ -105,7 +105,7 @@ export default function LandingPage() {
               proven success.
             </h2>
             <p className="headline-sm text-[var(--color-on-surface)] opacity-80 max-w-lg">
-              Orator is uniquely positioned — and proven — to be the single, secure environment for every team's AI-native agents, apps, and automations.
+              Orator is uniquely positioned — and proven — to be the single, secure environment for every team&apos;s AI-native agents, apps, and automations.
             </p>
           </div>
 
@@ -121,7 +121,7 @@ export default function LandingPage() {
               <Brain size={48} weight="duotone" className="mb-6 opacity-80" />
               <div>
                 <h3 className="headline-sm mb-3">Built for your most important workflows.</h3>
-                <p className="body-md opacity-90">Trusted by the world's most ambitious organizations.</p>
+                <p className="body-md opacity-90">Trusted by the world&apos;s most ambitious organizations.</p>
               </div>
             </div>
             <div className="bg-[var(--color-primary-60)] rounded-[24px] p-10 text-white flex flex-col justify-between aspect-square">
