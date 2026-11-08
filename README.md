@@ -76,3 +76,15 @@ npm run build
 ## Canonical project
 
 For the newer Java/Spring Boot + React implementation, architecture documentation, and current project presentation, use **[h55n/orator](https://github.com/h55n/orator)**.
+
+### Authentication checks
+
+`JWT_SECRET` must be explicitly configured with at least 32 characters, even
+for local API development. Missing or short keys disable auth routes with
+HTTP 503 before any database operation; there is no source-visible fallback
+signing key. Generate your own private key rather than using the example
+placeholder.
+
+`npm test` starts disposable local API servers using synthetic users and
+keys. It does not connect to PostgreSQL or call Groq. CI runs these tests
+and the frontend build on Node 20, 22 and 24.

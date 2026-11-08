@@ -17,12 +17,25 @@ const pool = new Pool({
 
 const query = (text, params) => pool.query(text, params);
 
+function signingKey() {
+  const key = process.env.JWT_SECRET;
+  if (!key || key.length < 32) throw new Error('JWT_SECRET must have at least 32 characters');
+  return key;
+}
+
+// Reject missing signing configuration before auth handlers can touch the DB.
+app.use('/api/auth', (req, res, next) => {
+  try { signingKey(); next(); }
+  catch { res.status(503).json({ message: 'Authentication unavailable' }); }
+});
+
+
 function authenticate(req, res, next) {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) return res.status(401).json({ message: 'Unauthorized' });
   const token = authHeader.split(' ')[1];
   try {
-    req.user = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret');
+    req.user = jwt.verify(token, signingKey());
     next();
   } catch (err) {
     return res.status(401).json({ message: 'Unauthorized' });
@@ -39,7 +52,7 @@ app.post('/api/auth/register', async (req, res) => {
       [name || email, email, hashedPassword]
     );
     const user = result.rows[0];
-    const token = jwt.sign({ sub: user.name, id: user.id }, process.env.JWT_SECRET || 'fallback_secret', { expiresIn: '24h' });
+    const token = jwt.sign({ sub: user.name, id: user.id }, signingKey(), { expiresIn: '24h' });
     res.status(201).json({ message: 'User registered successfully', token, user });
   } catch (err) {
     res.status(400).json({ message: 'Email already exists' });
@@ -54,7 +67,7 @@ app.post('/api/auth/login', async (req, res) => {
     const user = result.rows[0];
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ message: 'Invalid email or password' });
-    const token = jwt.sign({ sub: user.username, id: user.id }, process.env.JWT_SECRET || 'fallback_secret', { expiresIn: '24h' });
+    const token = jwt.sign({ sub: user.username, id: user.id }, signingKey(), { expiresIn: '24h' });
     res.status(200).json({ token, user: { id: user.id, name: user.username, email: user.email } });
   } catch (err) {
     res.status(500).json({ message: 'Internal Server Error' });
@@ -71,7 +84,7 @@ app.post('/api/auth/demo', async (req, res) => {
     } else {
         user = result.rows[0];
     }
-    const token = jwt.sign({ sub: user.username, id: user.id }, process.env.JWT_SECRET || 'fallback_secret', { expiresIn: '24h' });
+    const token = jwt.sign({ sub: user.username, id: user.id }, signingKey(), { expiresIn: '24h' });
     res.status(200).json({ token, user: { id: user.id, name: user.username, email: user.email } });
   } catch (err) {
     res.status(500).json({ message: 'Internal Server Error' });
