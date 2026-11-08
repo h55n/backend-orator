@@ -32,6 +32,8 @@ git clone https://github.com/h55n/backend-orator.git
 cd backend-orator
 npm install
 cp .env.example .env
+# Configure DATABASE_URL, JWT_SECRET, and GROQ_API_KEY in .env before continuing.
+npm run db:init
 npm run dev
 ```
 
@@ -71,6 +73,7 @@ Generated directories such as `node_modules/` and `dist/` are intentionally excl
 
 ```bash
 npm run build
+npm test
 ```
 
 ## Canonical project
