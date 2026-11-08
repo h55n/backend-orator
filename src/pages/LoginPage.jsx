@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import toast from 'react-hot-toast'
@@ -15,7 +15,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [demoLoading, setDemoLoading] = useState(false)
 
-  const handleDemoLogin = async () => {
+  const handleDemoLogin = useCallback(async () => {
     setDemoLoading(true)
     try {
       await demoLogin()
@@ -25,14 +25,14 @@ export default function LoginPage() {
     } finally {
       setDemoLoading(false)
     }
-  }
+  }, [demoLogin, navigate])
 
   // Auto-trigger demo login if query param ?demo=true is present
   useEffect(() => {
     if (new URLSearchParams(location.search).get('demo') === 'true') {
       handleDemoLogin()
     }
-  }, [])
+  }, [handleDemoLogin, location.search])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -89,7 +89,7 @@ export default function LoginPage() {
         </form>
 
         <div className="auth-footer">
-          Don't have an account? 
+          Don&apos;t have an account?
           <Link to="/register" className="auth-link">Create one</Link>
         </div>
       </div>

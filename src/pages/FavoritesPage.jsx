@@ -49,7 +49,7 @@ export default function FavoritesPage() {
       <div className="mb-12 animate-fade-in border-b border-[var(--color-border-subtle)] pb-8 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
         <div>
           <h1 className="headline-display text-[var(--color-primary)] mb-4">Favorites</h1>
-          <p className="headline-sm text-[var(--color-on-surface)] opacity-70 max-w-2xl">Questions you've saved for quick review.</p>
+          <p className="headline-sm text-[var(--color-on-surface)] opacity-70 max-w-2xl">Questions you&apos;ve saved for quick review.</p>
         </div>
         
         {!loading && questions.length > 0 && (
