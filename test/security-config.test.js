@@ -41,3 +41,10 @@ test('API startup rejects a missing JWT_SECRET instead of using a fallback', () 
   assert.match(result.stderr, /JWT_SECRET must be configured/);
   assert.doesNotMatch(result.stderr, /fallback_secret/);
 });
+
+test('demo account creation hashes its password before persistence', () => {
+  const source = readFileSync(new URL('../api/index.js', import.meta.url), 'utf8');
+
+  assert.match(source, /bcrypt\.hash\('demo', 10\)/);
+  assert.doesNotMatch(source, /VALUES \(\$1, \$2, \$3\).*\['demouser', 'demo@orator\.app', 'demo'\]/s);
+});

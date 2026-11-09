@@ -70,7 +70,8 @@ app.post('/api/auth/demo', async (req, res) => {
     let user;
     const result = await query('SELECT * FROM users WHERE username = $1', ['demouser']);
     if (result.rows.length === 0) {
-        const insertRes = await query('INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING *', ['demouser', 'demo@orator.app', 'demo']);
+        const demoPassword = await bcrypt.hash('demo', 10);
+        const insertRes = await query('INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING *', ['demouser', 'demo@orator.app', demoPassword]);
         user = insertRes.rows[0];
     } else {
         user = result.rows[0];
