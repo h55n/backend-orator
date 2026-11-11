@@ -34,7 +34,16 @@ function authenticate(req, res, next) {
 }
 
 // ── Auth ──
-app.post('/api/auth/register', async (req, res) => {
+function validateCredentials(req, res, next) {
+  const { email, password } = req.body || {};
+  if (typeof email !== 'string' || !email.trim() ||
+      typeof password !== 'string' || password.length === 0) {
+    return res.status(400).json({ message: 'Email and password are required' });
+  }
+  next();
+}
+
+app.post('/api/auth/register', validateCredentials, async (req, res) => {
   const { name, email, password } = req.body;
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -50,7 +59,7 @@ app.post('/api/auth/register', async (req, res) => {
   }
 });
 
-app.post('/api/auth/login', async (req, res) => {
+app.post('/api/auth/login', validateCredentials, async (req, res) => {
   const { email, password } = req.body;
   try {
     const result = await query('SELECT * FROM users WHERE email = $1', [email]);
