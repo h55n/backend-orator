@@ -287,9 +287,19 @@ app.delete('/api/favorites/:id', authenticate, async (req, res) => {
 
 app.get('/api/favorites', authenticate, async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 0;
-    const size = parseInt(req.query.size) || 20;
+    const parsePagination = (value, fallback) => {
+      if (value === undefined) return fallback;
+      if (typeof value !== 'string' || !/^\d+$/.test(value)) return NaN;
+      return Number(value);
+    };
+    const page = parsePagination(req.query.page, 0);
+    const size = parsePagination(req.query.size, 20);
     const offset = page * size;
+    if (!Number.isSafeInteger(page) || page < 0 ||
+        !Number.isSafeInteger(size) || size < 1 ||
+        !Number.isSafeInteger(offset)) {
+      return res.status(400).json({ message: 'Invalid pagination parameters' });
+    }
     const countResult = await query('SELECT COUNT(*) FROM favorites WHERE user_id = $1', [req.user.id]);
     const totalElements = parseInt(countResult.rows[0].count);
     const totalPages = Math.ceil(totalElements / size);
