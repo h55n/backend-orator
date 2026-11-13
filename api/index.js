@@ -107,7 +107,12 @@ app.get('/api/reference/technologies', (req, res) => {
 
 // ── Assessments ──
 app.post('/api/questions/generate', authenticate, async (req, res) => {
-  const { jobRole, technology, experienceLevel } = req.body;
+  const { jobRole, technology, experienceLevel } = req.body || {};
+  const isNonEmptyString = value => typeof value === 'string' && value.trim().length > 0;
+  if (!isNonEmptyString(jobRole) || !isNonEmptyString(technology) ||
+      (experienceLevel !== undefined && !isNonEmptyString(experienceLevel))) {
+    return res.status(400).json({ message: 'Job role and technology must be non-empty strings; experience level must be a non-empty string when provided' });
+  }
   if (!process.env.GROQ_API_KEY) return res.status(500).json({ message: "API Key missing" });
   
   const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
